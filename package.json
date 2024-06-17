@@ -1,0 +1,14 @@
+{
+  "name": "movi-mania",
+  "version": "1.0.0",
+  "description": "a movie project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "MM Nayem",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.4"
+  }
+}
