@@ -1,7 +1,9 @@
 import { getMovieReviewData } from "./data.js";
 
+let sortDesc = false
 const init = ()=>{
     const movieRevewData = getMovieReviewData()
+    registerHandlers(movieRevewData)
     printReviewData(movieRevewData)
     printMovieData(movieRevewData)
 }
@@ -37,10 +39,72 @@ const addStats = (elem, value) =>{
 
 const printMovieData  =(movieRevewData)=>{
     const flatReviewData = movieRevewData.flat()
-    flatReviewData.sort((a,b)=>a.on - b.on)
+   let sorted =  flatReviewData.toSorted((a,b)=>b.on - a.on)
+    const movieListEL = document.querySelector("#movieListId UL")
+    addMovieRevewData(movieListEL, sorted)
+    
+}
+
+const registerHandlers=(movieRevewData)=>{
+    const sortBtn = document.getElementById("srtBtnId")
+    const grpBtn = document.getElementById("grpBtnId")
+    sortBtn.addEventListener("click", ()=>sortByReview(movieRevewData) )
+    grpBtn.addEventListener("click", ()=>groupReviewsByTitle(movieRevewData) )
+}
+
+const sortByReview=(movieRevewData)=>{
+    const flatReviewData = movieRevewData.flat()
     const movieListEL = document.querySelector("#movieListId UL")
 
-    flatReviewData.map((movie)=>{
+
+    sortDesc = !sortDesc
+    let sortReviewData = sortDesc ?
+     flatReviewData.toSorted((a,b)=>b.rating - a.rating) :
+    flatReviewData.toSorted((a,b)=>a.rating - b.rating)
+    removeChildNodes(movieListEL)
+    addMovieRevewData(movieListEL, sortReviewData)
+}
+
+
+const groupReviewsByTitle= (movieRevewData)=>{
+    const flatReviewData = movieRevewData.flat()
+    const groupedReviews = Object.groupBy(flatReviewData, ({title})=>title)
+    const titlekeys = Reflect.ownKeys(groupedReviews)
+
+    const movieListEL = document.querySelector("#movieListId UL")
+    removeChildNodes(movieListEL)
+
+    titlekeys.forEach((title)=>{
+        const liEl = document.createElement("li")
+        liEl.classList.add("card", "my-2")
+
+        const hEl = document.createElement("h4")
+        hEl.classList.add("text-3xl")
+        hEl.innerText = title
+        liEl.appendChild(hEl)
+
+        const reviews = groupedReviews[title]
+
+        reviews.forEach((review)=>{
+            const pEl = document.createElement("p")
+            pEl.classList.add("mx-2", "my-2")
+
+            const message = ` <strong>${review.by}</strong> has given <strong>${review.rating}</strong> rating with a comment , <i>${review.content}</i>`
+
+            pEl.innerHTML = message
+            liEl.appendChild(pEl)
+
+        })
+
+        movieListEL.appendChild(liEl)
+    })
+
+
+}
+
+const addMovieRevewData=(movieListEL, sorted)=>{
+
+    sorted.map((movie)=>{
         const liElem = document.createElement("li")
         liElem.classList.add("card", "p-2", "my-2")
 
@@ -63,9 +127,13 @@ const printMovieData  =(movieRevewData)=>{
 
         movieListEL.appendChild(liElem)
         
-            
-        
     })
+}
+
+const removeChildNodes = (parent) =>{
+    while(parent.firstChild){
+        parent.removeChild(parent.firstChild)
+    }
 }
 
 init()
